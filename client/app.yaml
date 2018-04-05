@@ -1,16 +1,15 @@
-runtime: python27
+runtime: php55
 api_version: 1
-service: client
 threadsafe: true
+service: client
+skip_files:
+- ^node_modules$
 
 handlers:
-- url:
+- url: /
   static_files: build/index.html
   upload: build/index.html
 
 - url: /(.*)
   static_files: build/\1
   upload: build/(.*)
-
-skip_files:
- - ^node_modules$
