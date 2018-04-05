@@ -60,7 +60,7 @@ class App extends React.Component {
           <Grid container justify="center" spacing={12}>
             <Grid item sm={10} xs={11}>
               <h1>Shape of English</h1>
-              <p>Search a word you want to learn.</p>
+              <p>Search a word you want to learn!</p>
               <SearchForm />
             </Grid>
           </Grid>
