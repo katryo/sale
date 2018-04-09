@@ -14,17 +14,46 @@
 
 # [START app]
 import logging
+import requests
+import json
 
-from flask import Flask, render_template
-
+from flask import Flask, jsonify, request
+from flask_cors import CORS
 
 app = Flask(__name__)
-
+app.config.from_pyfile('./settings.cfg')
+CORS(app)
 
 @app.route('/')
 def hello():
     """Return a friendly HTTP greeting."""
     return 'abc'
+
+
+@app.route('/senses')
+def senses():
+    query = request.args.get('q', default='', type=str)  # TODO: validation
+    language = 'en'
+
+    url = 'https://od-api.oxforddictionaries.com:443/api/v1/entries/' + language + '/' + query.lower()
+
+    r = requests.get(url, headers={'app_id': app.config['OXFORD_APP_ID'], 'app_key': app.config['OXFORD_APP_KEY']})
+    if r.status_code is not 200:
+        return jsonify({'senses': [], 'status': 'failure'})
+    senses = json.loads(r.text)['results'][0]['lexicalEntries'][0]['entries'][0]['senses'] # TODO: validation
+
+    senses_output = []
+    for sense in senses:
+        sense_output = {'definifions': sense['definitions']}
+        if 'examples' in sense:
+            sense_output['examples'] = sense['examples']
+        senses_output.append(sense_output)
+
+    output = {'senses': senses_output, 'status': 'success'}
+
+    # print("code {}\n".format(r.status_code))
+    return jsonify(output)
+    # print("json \n" + json.dumps(r.json()))
 
 
 @app.errorhandler(500)
