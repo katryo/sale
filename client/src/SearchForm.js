@@ -1,11 +1,8 @@
 import React from "react";
 import Button from "material-ui/Button";
-import Input from "material-ui/Input";
 import Icon from "material-ui/Icon";
 import TextField from "material-ui/TextField";
 import Grid from "material-ui/Grid";
-import { FormControl, FormHelperText } from "material-ui/Form";
-import { withStyles } from "material-ui/styles";
 
 class SearchForm extends React.Component {
   constructor(props) {

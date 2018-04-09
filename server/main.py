@@ -44,9 +44,10 @@ def senses():
 
     senses_output = []
     for sense in senses:
-        sense_output = {'definitions': sense['definitions']}
-        if 'examples' in sense:
-            sense_output['examples'] = sense['examples']
+        sense_output = {}
+        for key in ['definitions', 'examples']:
+            if key in sense:
+                sense_output[key] = sense[key]
         senses_output.append(sense_output)
 
     output = {'senses': senses_output, 'status': 'success'}
@@ -54,6 +55,27 @@ def senses():
     # print("code {}\n".format(r.status_code))
     return jsonify(output)
     # print("json \n" + json.dumps(r.json()))
+
+
+@app.route('/images')
+def images():
+    search_url = "https://api.cognitive.microsoft.com/bing/v7.0/search"
+    headers = {"Ocp-Apim-Subscription-Key": app.config['MS_KEY']}
+    query = request.args.get('q', default='', type=str)  # TODO: validation
+    params = {"q": query}
+    response = requests.get(search_url, headers=headers, params=params)
+    response.raise_for_status()
+    search_results = response.json()
+    output_images = []
+    if 'images' in search_results:
+        for item in search_results['images']['value']:
+            output_images.append({
+                'thumbnailUrl': item['thumbnailUrl'],
+                'contentUrl': item['contentUrl'],
+                'hostPageUrl': item['hostPageUrl'],
+                'encodingFormat': item['encodingFormat']
+            })
+    return jsonify({'images': output_images})
 
 
 @app.errorhandler(500)

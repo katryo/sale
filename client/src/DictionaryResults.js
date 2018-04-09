@@ -1,9 +1,9 @@
 import React from "react";
 
 function DictionaryResults(props) {
-  const senses = props.senses.map(sense => {
-    return <li key={sense.definitions[0]}>{sense.definitions[0]}</li>;
-  });
+  const senses = props.senses
+    .filter(sense => sense.definitions !== undefined)
+    .map(sense => <li key={sense.definitions[0]}>{sense.definitions[0]}</li>);
 
   return (
     <div>

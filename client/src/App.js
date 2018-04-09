@@ -1,20 +1,12 @@
 import React from "react";
-import Button from "material-ui/Button";
 import CssBaseline from "material-ui/CssBaseline";
-import Input from "material-ui/Input";
-import Icon from "material-ui/Icon";
-import TextField from "material-ui/TextField";
 import Grid from "material-ui/Grid";
 import Paper from "material-ui/Paper";
-import { FormControl, FormHelperText } from "material-ui/Form";
-import AppBar from "material-ui/AppBar";
-import Toolbar from "material-ui/Toolbar";
-import Typography from "material-ui/Typography";
 import axios from "axios";
 import { withStyles } from "material-ui/styles";
-import qs from "qs";
 import SearchForm from "./SearchForm";
 import DictionaryResults from "./DictionaryResults";
+import ImageResults from "./ImageResults";
 
 const styles = theme => ({
   container: theme.mixins.gutters({
@@ -28,7 +20,7 @@ const styles = theme => ({
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { query: "", senses: [] };
+    this.state = { query: "", senses: [], images: [] };
     this.handleChangeQuery = this.handleChangeQuery.bind(this);
     this.handleClickSearch = this.handleClickSearch.bind(this);
   }
@@ -37,25 +29,34 @@ class App extends React.Component {
     this.setState({ query: event.target.value });
   }
 
-  handleClickSearch(event) {
-    const that = this;
-    const url = "http://127.0.0.1:8080/senses";
+  requestToServer(query, path, successHandler) {
+    const url = "http://127.0.0.1:8080" + path;
     const options = {
       method: "GET",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json"
       },
-      params: { q: this.state.query },
+      params: { q: query },
       url
     };
     axios(options)
-      .then(function(response) {
-        that.setState({ senses: response.data.senses });
-      })
+      .then(successHandler)
       .catch(function(error) {
         console.log(error);
       });
+  }
+
+  handleClickSearch(event) {
+    const successSensesHandler = response => {
+      this.setState({ senses: response.data.senses });
+    };
+    this.requestToServer(this.state.query, "/senses", successSensesHandler);
+
+    const successImagesHandler = response => {
+      this.setState({ images: response.data.images });
+    };
+    this.requestToServer(this.state.query, "/images", successImagesHandler);
   }
 
   render() {
@@ -80,13 +81,19 @@ class App extends React.Component {
               </Paper>
             </Grid>
 
-            <Grid item xs={12}>
+            <Grid item md={6} xs={12}>
               <Paper elevation={1} className={classes.container}>
                 <DictionaryResults
                   senses={
                     this.state.senses === undefined ? [] : this.state.senses
                   }
                 />
+              </Paper>
+            </Grid>
+
+            <Grid item md={6} xs={12}>
+              <Paper elevation={1} className={classes.container}>
+                <ImageResults images={this.state.images} />
               </Paper>
             </Grid>
           </Grid>
