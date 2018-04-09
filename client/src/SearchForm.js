@@ -16,7 +16,7 @@ class SearchForm extends React.Component {
   }
 
   handleChangeQuery(e) {
-    console.log(e);
+    this.props.onChangeQuery(e);
   }
 
   handleClickSearch(e) {

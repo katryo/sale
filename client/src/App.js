@@ -14,12 +14,14 @@ import axios from "axios";
 import { withStyles } from "material-ui/styles";
 import qs from "qs";
 import SearchForm from "./SearchForm";
+import DictionaryResults from "./DictionaryResults";
 
 const styles = theme => ({
   container: theme.mixins.gutters({
     padding: 16,
-    margin: 16,
-    marginTop: theme.spacing.unit * 3
+    marginRight: 16,
+    marginLeft: 16,
+    marginTop: theme.spacing.unit * 1
   })
 });
 
@@ -32,7 +34,7 @@ class App extends React.Component {
   }
 
   handleChangeQuery(event) {
-    this.setState({ value: event.target.value });
+    this.setState({ query: event.target.value });
   }
 
   handleClickSearch(event) {
@@ -44,7 +46,7 @@ class App extends React.Component {
         Accept: "application/json",
         "Content-Type": "application/json"
       },
-      params: { q: "web" },
+      params: { q: this.state.query },
       url
     };
     axios(options)
@@ -64,7 +66,7 @@ class App extends React.Component {
         <div>
           <Grid container justify="center" spacing={16}>
             <Grid item xs={12}>
-              <Paper elevation={4} className={classes.container}>
+              <Paper elevation={1} className={classes.container}>
                 <h1>Shape of English</h1>
                 <p>
                   You will see images, mesnings, examples, videos that related
@@ -79,8 +81,12 @@ class App extends React.Component {
             </Grid>
 
             <Grid item xs={12}>
-              <Paper elevation={4} className={classes.container}>
-                {this.state.senses.length}
+              <Paper elevation={1} className={classes.container}>
+                <DictionaryResults
+                  senses={
+                    this.state.senses === undefined ? [] : this.state.senses
+                  }
+                />
               </Paper>
             </Grid>
           </Grid>

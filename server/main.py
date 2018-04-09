@@ -44,7 +44,7 @@ def senses():
 
     senses_output = []
     for sense in senses:
-        sense_output = {'definifions': sense['definitions']}
+        sense_output = {'definitions': sense['definitions']}
         if 'examples' in sense:
             sense_output['examples'] = sense['examples']
         senses_output.append(sense_output)
