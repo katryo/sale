@@ -22,9 +22,9 @@ class SearchForm extends React.Component {
 
   render() {
     return (
-      <form>
+      <form onSubmit={this.handleClickSearch}>
         <Grid container spacing={16}>
-          <Grid item sm={10} xs={12}>
+          <Grid item md={10} sm={9} xs={12}>
             <TextField
               id="search"
               label="Search a word you want to learn!"
@@ -34,7 +34,7 @@ class SearchForm extends React.Component {
               fullWidth
             />
           </Grid>
-          <Grid item sm={2} xs={12}>
+          <Grid item md={2} sm={3} xs={12}>
             <Button
               color="primary"
               size="large"

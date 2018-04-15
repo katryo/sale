@@ -5,6 +5,7 @@ import Paper from "material-ui/Paper";
 import axios from "axios";
 import { withStyles } from "material-ui/styles";
 import SearchForm from "./SearchForm";
+import Typography from "material-ui/Typography";
 import DictionaryResults from "./DictionaryResults";
 import ImageResults from "./ImageResults";
 
@@ -20,7 +21,7 @@ const styles = theme => ({
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { query: "", senses: [], images: [] };
+    this.state = { query: "", dictEntries: [], images: [] };
     this.handleChangeQuery = this.handleChangeQuery.bind(this);
     this.handleClickSearch = this.handleClickSearch.bind(this);
   }
@@ -48,8 +49,9 @@ class App extends React.Component {
   }
 
   handleClickSearch(event) {
+    event.preventDefault();
     const successSensesHandler = response => {
-      this.setState({ senses: response.data.senses });
+      this.setState({ dictEntries: response.data.entries });
     };
     this.requestToServer(this.state.query, "/senses", successSensesHandler);
 
@@ -61,6 +63,35 @@ class App extends React.Component {
 
   render() {
     const { classes } = this.props;
+
+    let dictionaryResults = "";
+    if (this.state.dictEntries && this.state.dictEntries.length > 0) {
+      dictionaryResults = (
+        <Grid item md={6} xs={12}>
+          <Paper elevation={1} className={classes.container}>
+            <DictionaryResults
+              dictEntries={
+                this.state.dictEntries === undefined
+                  ? []
+                  : this.state.dictEntries
+              }
+            />
+          </Paper>
+        </Grid>
+      );
+    }
+
+    let imageResults = "";
+    if (this.state.images && this.state.images.length > 0) {
+      imageResults = (
+        <Grid item md={6} xs={12}>
+          <Paper elevation={1} className={classes.container}>
+            <ImageResults images={this.state.images} />
+          </Paper>
+        </Grid>
+      );
+    }
+
     return (
       <React.Fragment>
         <CssBaseline />
@@ -68,11 +99,12 @@ class App extends React.Component {
           <Grid container justify="center" spacing={16}>
             <Grid item xs={12}>
               <Paper elevation={1} className={classes.container}>
-                <h1>Shape of English</h1>
-                <p>
-                  You will see images, mesnings, examples, videos that related
-                  to the word you input!
-                </p>
+                <Typography variant="display3">Shape of English</Typography>
+                <Typography variant="body2">
+                  This web page is an English learning tool. You can get the
+                  meanings, example usage, and videos that are related to the
+                  word or phrase you input!
+                </Typography>
                 <SearchForm
                   query={this.props.query}
                   onClickSearch={this.handleClickSearch}
@@ -81,21 +113,8 @@ class App extends React.Component {
               </Paper>
             </Grid>
 
-            <Grid item md={6} xs={12}>
-              <Paper elevation={1} className={classes.container}>
-                <DictionaryResults
-                  senses={
-                    this.state.senses === undefined ? [] : this.state.senses
-                  }
-                />
-              </Paper>
-            </Grid>
-
-            <Grid item md={6} xs={12}>
-              <Paper elevation={1} className={classes.container}>
-                <ImageResults images={this.state.images} />
-              </Paper>
-            </Grid>
+            {dictionaryResults}
+            {imageResults}
           </Grid>
         </div>
       </React.Fragment>

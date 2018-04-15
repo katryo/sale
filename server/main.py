@@ -40,21 +40,25 @@ def senses():
     r = requests.get(url, headers={'app_id': app.config['OXFORD_APP_ID'], 'app_key': app.config['OXFORD_APP_KEY']})
     if r.status_code is not 200:
         return jsonify({'senses': [], 'status': 'failure'})
-    senses = json.loads(r.text)['results'][0]['lexicalEntries'][0]['entries'][0]['senses'] # TODO: validation
+    entries = json.loads(r.text)['results'][0]['lexicalEntries']  # TODO: validation
 
-    senses_output = []
-    for sense in senses:
-        sense_output = {}
-        for key in ['definitions', 'examples']:
-            if key in sense:
-                sense_output[key] = sense[key]
-        senses_output.append(sense_output)
+    output = {'entries': []}
+    for entry in entries:
+        pronunciations = entry['pronunciations']
+        senses = entry['entries'][0]['senses']
 
-    output = {'senses': senses_output, 'status': 'success'}
+        senses_output = []
+        for sense in senses:
+            sense_output = {}
+            for key in ['definitions', 'domains', 'examples']:
+                if key in sense:
+                    sense_output[key] = sense[key]
+            senses_output.append(sense_output)
 
-    # print("code {}\n".format(r.status_code))
+        entry_output = {'senses': senses_output, 'status': 'success', 'pronunciations': pronunciations}
+        output['entries'].append(entry_output)
+
     return jsonify(output)
-    # print("json \n" + json.dumps(r.json()))
 
 
 @app.route('/images')

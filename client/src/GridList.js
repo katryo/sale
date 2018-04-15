@@ -17,6 +17,14 @@ const styles = theme => ({
   },
   subheader: {
     width: "100%"
+  },
+  imgFullHeight: {
+    maxHeight: "100%",
+    maxWidth: "100%"
+  },
+  imgFullWidth: {
+    maxHeight: "100%",
+    maxWidth: "100%"
   }
 });
 
@@ -28,9 +36,11 @@ function ImageGridList(props) {
       <GridList cellHeight={160} className={classes.gridList} cols={3}>
         {props.images.map(image => (
           <a href={image.hostPageUrl} key={image.thumbnailUrl}>
-            <GridListTile cols={1}>
-              <img src={image.thumbnailUrl} alt={image.thumbnailUrl} />
-            </GridListTile>
+            <img
+              src={image.thumbnailUrl}
+              alt={image.thumbnailUrl}
+              className={classes.imgFullWidth}
+            />
           </a>
         ))}
       </GridList>

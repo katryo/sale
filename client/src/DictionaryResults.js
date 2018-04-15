@@ -1,14 +1,25 @@
 import React from "react";
+import Typography from "material-ui/Typography";
+import DictEntry from "./DictEntry";
 
 function DictionaryResults(props) {
-  const senses = props.senses
-    .filter(sense => sense.definitions !== undefined)
-    .map(sense => <li key={sense.definitions[0]}>{sense.definitions[0]}</li>);
+  const entries = props.dictEntries
+    .filter(entry => entry.senses !== undefined)
+    .map(entry => (
+      <div>
+        <DictEntry
+          senses={entry.senses}
+          pronunciations={entry.pronunciations}
+        />
+      </div>
+    ));
 
   return (
     <div>
-      <h2>Definitions</h2>
-      <ul>{senses}</ul>
+      <Typography variant="title" gutterBottom>
+        Definitions
+      </Typography>
+      {entries}
     </div>
   );
 }
