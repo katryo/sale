@@ -12,7 +12,7 @@ const styles = {
 
 function DefinitionsList(props) {
   const definitions = props.definitions.map(definition => (
-    <li>
+    <li key={definition}>
       <Typography>{definition}</Typography>
     </li>
   ));
@@ -25,12 +25,15 @@ function DictEntry(props) {
   const senses = props.senses
     .filter(sense => sense.definitions !== undefined)
     .map(sense => (
-      <div>
-        <DefinitionsList definitions={sense.definitions} />
+      <div key={sense.id}>
+        <DefinitionsList
+          definitions={sense.definitions}
+          examples={sense.examples}
+        />
       </div>
     ));
   const pronunciations = props.pronunciations.map(pron => (
-    <div>
+    <div key={pron.audioFile}>
       <audio controls>
         <source src={pron.audioFile} type="audio/mpeg" />
       </audio>

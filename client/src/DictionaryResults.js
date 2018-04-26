@@ -6,7 +6,7 @@ function DictionaryResults(props) {
   const entries = props.dictEntries
     .filter(entry => entry.senses !== undefined)
     .map(entry => (
-      <div>
+      <div key={entry.id}>
         <DictEntry
           senses={entry.senses}
           pronunciations={entry.pronunciations}
