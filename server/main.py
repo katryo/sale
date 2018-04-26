@@ -41,21 +41,30 @@ def senses():
     if r.status_code is not 200:
         return jsonify({'senses': [], 'status': 'failure'})
     entries = json.loads(r.text)['results'][0]['lexicalEntries']  # TODO: validation
-
     output = {'entries': []}
-    for entry in entries:
-        pronunciations = entry['pronunciations']
-        senses = entry['entries'][0]['senses']
+    for i, entry in enumerate(entries):
+        pronunciations = []
+        for pc in entry['pronunciations']:
+            same_audio = False
+            for pr in pronunciations:
+                if pr['audioFile'] == pc['audioFile']:
+                    same_audio = True
+                    break
+            if same_audio:
+                continue
+            pronunciations.append(pc)
+        sense_results = entry['entries'][0]['senses']
 
         senses_output = []
-        for sense in senses:
+        for j, sense in enumerate(sense_results):
             sense_output = {}
             for key in ['definitions', 'domains', 'examples']:
                 if key in sense:
                     sense_output[key] = sense[key]
+            sense_output['id'] = '{}{}'.format(i, j)
             senses_output.append(sense_output)
 
-        entry_output = {'senses': senses_output, 'status': 'success', 'pronunciations': pronunciations}
+        entry_output = {'id': i, 'senses': senses_output, 'status': 'success', 'pronunciations': pronunciations}
         output['entries'].append(entry_output)
 
     return jsonify(output)
@@ -63,7 +72,7 @@ def senses():
 
 @app.route('/images')
 def images():
-    search_url = "https://api.cognitive.microsoft.com/bing/v7.0/search"
+    search_url = "https://api.cognitive.microsoft.com/bing/v7.0/images/search"
     headers = {"Ocp-Apim-Subscription-Key": app.config['MS_KEY']}
     query = request.args.get('q', default='', type=str)  # TODO: validation
     params = {"q": query}
@@ -71,15 +80,33 @@ def images():
     response.raise_for_status()
     search_results = response.json()
     output_images = []
-    if 'images' in search_results:
-        for item in search_results['images']['value']:
-            output_images.append({
-                'thumbnailUrl': item['thumbnailUrl'],
-                'contentUrl': item['contentUrl'],
-                'hostPageUrl': item['hostPageUrl'],
-                'encodingFormat': item['encodingFormat']
-            })
+
+    for item in search_results['value']:
+        output_images.append({
+            'thumbnailUrl': item['thumbnailUrl'],
+            'contentUrl': item['contentUrl'],
+            'hostPageUrl': item['hostPageUrl'],
+            'encodingFormat': item['encodingFormat'],
+            'name': item['name']
+        })
     return jsonify({'images': output_images})
+
+
+@app.route('/suggestions')
+def suggestions():
+    url = 'https://api.cognitive.microsoft.com/bing/v7.0/Suggestions'
+    headers = {"Ocp-Apim-Subscription-Key": app.config['MS_KEY']}
+    query = request.args.get('q', default='', type=str)  # TODO: validation
+    params = {"q": query, 'mkt': 'en-US'}
+    response = requests.get(url, headers=headers, params=params)
+    response.raise_for_status()
+    results = response.json()
+    suggestions = []
+    for suggestion_group in results['suggestionGroups']:
+        for suggestion in suggestion_group['searchSuggestions']:
+            suggestions.append(suggestion["displayText"])
+
+    return jsonify({'suggestions': suggestions})
 
 
 @app.errorhandler(500)
